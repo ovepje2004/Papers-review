@@ -1,0 +1,8 @@
+## Abstract
+
+- Binarization(-1, 1)은 LLM의 크기를 효과적으로 줄임, 그러나 언어적 성능 크게 저하
+- 새로운 이진화 기법인 Mixture of scales(BinaryMoS) 제안.
+    - 이진 가중치에 대해 여러개의 scaling experts 활용
+    - 각 token마다 experts를 통해 scaling factors 생성
+- 이와 같은 token-adaptive 방식은 문맥에 따라 이진 가중치 값을 조절할 수 있어 표현력 강화
+- Adaptation process는 전체(x), scaling factors(o)에만 적용하여 기존 방식과 유사한 수준의 압축 효율
