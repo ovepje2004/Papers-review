@@ -6,3 +6,12 @@
     - 각 token마다 experts를 통해 scaling factors 생성
 - 이와 같은 token-adaptive 방식은 문맥에 따라 이진 가중치 값을 조절할 수 있어 표현력 강화
 - Adaptation process는 전체(x), scaling factors(o)에만 적용하여 기존 방식과 유사한 수준의 압축 효율
+
+## 1. Intro
+
+- 기존 양자화 기법인 GPTQ, AWQ, OWQ 등은 16bit floating point weights를 4비트 표현으로 변환 성공
+- 나아가 Binarization은 가중치를 1비트로 줄여 모델 크기를 1/16 크기로 압축 가능
+    - 근데 aggressive compression → 가중치의 representational capacity 제한
+    - LLM 특화 Binarization 연구 중이지만 다음과 같은 문제 존재.
+        - high memory overhead
+        - struggle to achieve sufficient accuracy
