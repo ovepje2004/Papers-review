@@ -15,3 +15,37 @@
     - LLM 특화 Binarization 연구 중이지만 다음과 같은 문제 존재.
         - high memory overhead
         - struggle to achieve sufficient accuracy
+
+## 2. Background
+
+- **2-1. Binarization of LLMs**
+    - 기본적으로 Full-Precision 가중치 파라미터를 1비트 값으로 변환하는 방식
+        - full-precision 가중치 행렬 W_FP에서 W_FP의 평균을 뺀 값을 Sign함수로  binarization.
+            - Sign(x)는 부호함수로, 양수면 1, 음수면 -1, 0이면 0으로 표현
+            - W_B는  binarization된 가중치 행렬
+        
+        $$
+        W_B = \alpha·Sign(W_{FP}-\overline{W}_{FP})
+        $$
+        
+        - α는 출력 차원 크기의 Scaling factors이고,  binarization된 가중치 값을 조정
+            - 출력 채널 별(=행 단위)로 가중치 세기 조절
+            - 기존 가중치와 binarization 거친 가중치의 표현 gap을 보완
+            
+    - 근데 전통적인 딥러닝 모델에서는 성공적인데, LLM에서는 성능이 크게 저하. 그래서 여러 기법 개발ing
+        - PB-LLM(Partial Binarization): 일부만 이진화하고 중요한(salient) 가중치를  high-precision로 유지
+        - BiLLM: Scaling factors를 더 정교하게 할당.
+            - 가중치가 정규분포를 따른다고 가정하고, 평균에 가까운 concentrated 가중치와 평균에서 먼 sparse 가중치로 구분. 각 그룹에 대해 서로 다른 Scaling factors 할당하여 오차 최소화.
+        - One-bit: 입력/출력 양방향에 Scaling factors 적용하여 정확도 향상(기존엔 출력 차원만 적용)
+            - 이중차원 스케일링은 이진화 오차를 양방향으로 줄임
+            
+            $$
+            Y = [(X⊙S_{in})Sign(W^T_{FP})]⊙S_{out}
+            $$
+            
+            - 입력 X에 대해 S_in 곱해서 스케일 조정한 후 이진화된 가중치 행렬과 행렬곱
+            - 이후 출력값 각각에 대해 S_out 곱해서 스케일 조정
+    
+    그치만 여전히 full-precision 모델과 binarized 모델 간의 성능 격차 존재
+    
+    ⇒ 메모리 효율성은 유지하면서 정확도 격차를 줄여야 함.
